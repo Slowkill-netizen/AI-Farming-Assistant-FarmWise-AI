@@ -9,6 +9,34 @@
 </head>
 <body class="chat-page">
 
+    <!-- FARMER PROFILE MODAL -->
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="logo-icon" style="font-size: 40px;">🌿</span>
+                <h2>Karibu! Welcome to FarmWise AI</h2>
+                <p>Let's personalize your experience so Bwana Shamba can help you better.</p>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="farmerName">What is your name? (Jina lako)</label>
+                    <input type="text" id="farmerName" placeholder="e.g. Gilbert Mutwiri">
+                </div>
+                <div class="form-group">
+                    <label for="farmerLocation">Where are you farming? (Local Town/County)</label>
+                    <input type="text" id="farmerLocation" placeholder="e.g. Nakuru, Meru, or Western Kenya">
+                </div>
+                <div class="form-group">
+                    <label for="farmerCrops">What crops are you currently growing?</label>
+                    <input type="text" id="farmerCrops" placeholder="e.g. Maize, Tomatoes, Avocado">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="saveProfile()">Start Farming with AI</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR -->
     <nav class="navbar">
         <div class="logo">

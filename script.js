@@ -1,5 +1,7 @@
 let currentImageBase64 = null;
 let currentWeather = null;
+let chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+let farmerProfile = JSON.parse(localStorage.getItem("farmerProfile")) || null;
 
 async function sendMessage() {
     let userInput = document.getElementById("userInput");
@@ -29,13 +31,19 @@ async function sendMessage() {
     chatbox.scrollTop = chatbox.scrollHeight;
 
     const payload = {
-        message: input || "Please analyze this crop image. Identify the plant, any diseases or pests, and suggest local Kenyan treatments.",
+        message: input || "Please analyze this crop image.",
         image: currentImageBase64,
+        profile: farmerProfile,
+        history: chatHistory.slice(-10), // Send last 10 messages for context
         context: {
-            location: document.getElementById("weatherLocation").innerText,
+            location: farmerProfile ? farmerProfile.location : document.getElementById("weatherLocation").innerText,
             weather: currentWeather
         }
     };
+
+    // Add user message to local history
+    chatHistory.push({ role: "user", content: input || "[Image uploaded]" });
+    saveChatHistory();
 
     // Reset input elements
     removeImage();
@@ -50,6 +58,10 @@ async function sendMessage() {
 
         let data = await response.json();
         loading.remove();
+
+        // Add AI reply to history
+        chatHistory.push({ role: "assistant", content: data.reply });
+        saveChatHistory();
 
         const formattedReply = formatMessage(data.reply);
         chatbox.innerHTML += `<div class="bot-message">${formattedReply}</div>`;
@@ -132,10 +144,18 @@ function removeImage() {
     document.getElementById("fileInput").value = "";
 }
 
-async function fetchWeather() {
+async function fetchWeather(manualLocation = null) {
     try {
-        // Nairobi coordinates: 1.2921 S, 36.8219 E
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-1.2921&longitude=36.8219&current_weather=true";
+        let lat = -1.2921, lon = 36.8219; // Default Nairobi
+        let locationName = "Nairobi, Kenya";
+
+        if (manualLocation) {
+            locationName = manualLocation;
+            // Note: In a real app, we'd geocode the location string. 
+            // For now, we'll use Nairobi as fallback but display the farmer's location name.
+        }
+
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
         const res = await fetch(url);
         const data = await res.json();
         
@@ -180,7 +200,59 @@ function formatMessage(text) {
     return text.replace(/\n/g, "<br>");
 }
 
+// MODAL & PROFILE LOGIC
+function checkProfile() {
+    if (!farmerProfile) {
+        document.getElementById("profileModal").style.display = "flex";
+    } else {
+        loadHistoryToUI();
+        fetchWeather(farmerProfile.location);
+    }
+}
+
+function saveProfile() {
+    const name = document.getElementById("farmerName").value;
+    const location = document.getElementById("farmerLocation").value;
+    const crops = document.getElementById("farmerCrops").value;
+
+    if (!name || !location || !crops) {
+        alert("Please fill in all details so Bwana Shamba can help you!");
+        return;
+    }
+
+    farmerProfile = { name, location, crops };
+    localStorage.setItem("farmerProfile", JSON.stringify(farmerProfile));
+    
+    document.getElementById("profileModal").style.display = "none";
+    
+    // Greet user
+    const chatbox = document.getElementById("chatbox");
+    chatbox.innerHTML += `<div class="bot-message"><strong>Bwana Shamba AI:</strong> Karibu sana, ${name}! It's good to meet you. I see you're farming in ${location} and growing ${crops}. How can I help you today?</div>`;
+    
+    fetchWeather(location);
+}
+
+function saveChatHistory() {
+    localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+}
+
+function loadHistoryToUI() {
+    const chatbox = document.getElementById("chatbox");
+    chatHistory.forEach(msg => {
+        const cls = msg.role === "user" ? "user-message" : "bot-message";
+        const content = msg.role === "assistant" ? formatMessage(msg.content) : msg.content;
+        chatbox.innerHTML += `<div class="${cls}">${content}</div>`;
+    });
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function clearMemory() {
+    localStorage.removeItem("chatHistory");
+    chatHistory = [];
+    location.reload();
+}
+
 // Call on load
 window.onload = () => {
-    fetchWeather();
+    checkProfile();
 };
