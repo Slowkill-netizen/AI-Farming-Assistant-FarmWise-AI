@@ -151,8 +151,13 @@ async function fetchWeather(manualLocation = null) {
 
         if (manualLocation) {
             locationName = manualLocation;
-            // Note: In a real app, we'd geocode the location string. 
-            // For now, we'll use Nairobi as fallback but display the farmer's location name.
+            // Simple coordinate lookup for common Kenyan farming areas
+            const locLower = manualLocation.toLowerCase();
+            if (locLower.includes("nakuru")) { lat = -0.3031; lon = 36.0884; }
+            else if (locLower.includes("meru")) { lat = 0.0463; lon = 37.6559; }
+            else if (locLower.includes("kisumu")) { lat = -0.0917; lon = 34.7680; }
+            else if (locLower.includes("mombasa")) { lat = -4.0435; lon = 39.6682; }
+            else if (locLower.includes("eldoret")) { lat = 0.5143; lon = 35.2697; }
         }
 
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
@@ -163,7 +168,7 @@ async function fetchWeather(manualLocation = null) {
             const temp = data.current_weather.temperature;
             const wmoCode = data.current_weather.weathercode;
             
-            document.getElementById("weatherLocation").innerText = "Nairobi, Kenya";
+            document.getElementById("weatherLocation").innerText = locationName;
             document.getElementById("weatherTemp").innerText = `${temp}°C`;
             
             currentWeather = {
