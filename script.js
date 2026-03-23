@@ -168,8 +168,11 @@ async function fetchWeather(manualLocation = null) {
             const temp = data.current_weather.temperature;
             const wmoCode = data.current_weather.weathercode;
             
-            document.getElementById("weatherLocation").innerText = locationName;
-            document.getElementById("weatherTemp").innerText = `${temp}°C`;
+            const locEl = document.getElementById("weatherLocation");
+            const tempEl = document.getElementById("weatherTemp");
+            
+            if (locEl) locEl.innerText = locationName;
+            if (tempEl) tempEl.innerText = `${temp}°C`;
             
             currentWeather = {
                 temp: temp,
@@ -186,12 +189,15 @@ async function fetchWeather(manualLocation = null) {
             else if (wmoCode >= 80 && wmoCode <= 82) { desc = "Showers"; icon = "🌦️"; }
             else if (wmoCode >= 95) { desc = "Thunderstorm"; icon = "⛈️"; }
             
-            document.getElementById("weatherDesc").innerText = desc;
-            document.getElementById("weatherIcon").innerText = icon;
+            const descEl = document.getElementById("weatherDesc");
+            const iconEl = document.getElementById("weatherIcon");
+            if (descEl) descEl.innerText = desc;
+            if (iconEl) iconEl.innerText = icon;
         }
     } catch (e) {
         console.error("Error fetching weather:", e);
-        document.getElementById("weatherLocation").innerText = "Location Offline";
+        const weatherLocationEl = document.getElementById("weatherLocation");
+        if (weatherLocationEl) weatherLocationEl.innerText = "Location Offline";
     }
 }
 
@@ -207,18 +213,27 @@ function formatMessage(text) {
 
 // MODAL & PROFILE LOGIC
 function checkProfile() {
-    if (!farmerProfile) {
-        document.getElementById("profileModal").style.display = "flex";
-    } else {
+    const savedProfile = localStorage.getItem("farmerProfile");
+    if (savedProfile) {
+        farmerProfile = JSON.parse(savedProfile);
         loadHistoryToUI();
         fetchWeather(farmerProfile.location);
+    } else {
+        const modal = document.getElementById("profileModal");
+        if (modal) modal.style.display = "flex";
     }
 }
 
 function saveProfile() {
-    const name = document.getElementById("farmerName").value;
-    const location = document.getElementById("farmerLocation").value;
-    const crops = document.getElementById("farmerCrops").value;
+    const nameEl = document.getElementById("farmerName");
+    const locEl = document.getElementById("farmerLocation");
+    const cropsEl = document.getElementById("farmerCrops");
+
+    if (!nameEl || !locEl || !cropsEl) return;
+
+    const name = nameEl.value;
+    const location = locEl.value;
+    const crops = cropsEl.value;
 
     if (!name || !location || !crops) {
         alert("Please fill in all details so Bwana Shamba can help you!");
@@ -228,11 +243,14 @@ function saveProfile() {
     farmerProfile = { name, location, crops };
     localStorage.setItem("farmerProfile", JSON.stringify(farmerProfile));
     
-    document.getElementById("profileModal").style.display = "none";
+    const modal = document.getElementById("profileModal");
+    if (modal) modal.style.display = "none";
     
     // Greet user
     const chatbox = document.getElementById("chatbox");
-    chatbox.innerHTML += `<div class="bot-message"><strong>Bwana Shamba AI:</strong> Karibu sana, ${name}! It's good to meet you. I see you're farming in ${location} and growing ${crops}. How can I help you today?</div>`;
+    if (chatbox) {
+        chatbox.innerHTML += `<div class="bot-message"><strong>Bwana Shamba AI:</strong> Karibu sana, ${name}! It's good to meet you. I see you're farming in ${location} and growing ${crops}. How can I help you today?</div>`;
+    }
     
     fetchWeather(location);
 }
@@ -243,6 +261,8 @@ function saveChatHistory() {
 
 function loadHistoryToUI() {
     const chatbox = document.getElementById("chatbox");
+    if (!chatbox) return;
+
     chatHistory.forEach(msg => {
         const cls = msg.role === "user" ? "user-message" : "bot-message";
         const content = msg.role === "assistant" ? formatMessage(msg.content) : msg.content;
