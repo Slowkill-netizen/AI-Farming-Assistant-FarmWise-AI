@@ -5,6 +5,7 @@ import OpenAI from "openai";
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+app.use(express.static('.'));
 
 const openai = new OpenAI({
     apiKey: "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",

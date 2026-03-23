@@ -2,7 +2,9 @@ let currentImageBase64 = null;
 let currentWeather = null;
 
 async function sendMessage() {
-    let input = document.getElementById("userInput").value;
+    let userInput = document.getElementById("userInput");
+    if (!userInput) return;
+    let input = userInput.value;
     if (!input && !currentImageBase64) return;
 
     let chatbox = document.getElementById("chatbox");
