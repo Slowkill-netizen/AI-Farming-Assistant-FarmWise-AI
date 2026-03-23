@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmWise AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span> FarmWise AI
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">About</a>
+            <a href="#">Features</a>
+            <a href="#">Weather Advice</a>
+            <a href="#" class="btn-primary">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Your Smart Farming Assistant</h1>
+            <p>Get instant crop advice, disease detection, and weather alerts with AI.</p>
+            <div class="hero-actions">
+                <button class="btn-primary" onclick="document.getElementById('chat-section').scrollIntoView()">Try the Chatbot</button>
+                <button class="btn-secondary">Learn More</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="../../farmer_hero.png" alt="Farmer with smartphone" id="hero-illustration">
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <div class="feature-card">
+            <div class="icon-circle bg-green">💬</div>
+            <div class="feature-text">
+                <h3>AI Farming Advice</h3>
+                <p>Ask questions and get expert guidance.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="icon-circle bg-yellow">🔍</div>
+            <div class="feature-text">
+                <h3>Crop Disease Detection</h3>
+                <p>Upload a photo to diagnose crop problems.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="icon-circle bg-blue">🌧️</div>
+            <div class="feature-text">
+                <h3>Weather Alerts</h3>
+                <p>Get weather-based farming tips.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN APP SECTION -->
+    <section class="main-app" id="chat-section">
+        <h2>Chat with FarmWise AI</h2>
+        
+        <div class="app-grid">
+            
+            <!-- CHATBOX -->
+            <div class="chat-panel">
+                <div class="chat-container" id="chatbox">
+                    <div class="bot-message">
+                        <strong>FarmWise AI:</strong> Hello! Ask me anything about farming, or upload a photo of a sick plant for diagnosis.
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <button class="icon-btn" onclick="document.getElementById('fileInput').click()">📸 Photo</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)">
+                    <button class="icon-btn mic-btn" onclick="startVoice()">🎙️</button>
+                    <input type="text" id="userInput" placeholder="Type or speak..." onkeypress="handleEnter(event)">
+                    <button class="btn-primary send-btn" onclick="sendMessage()">Send</button>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="q-btn" onclick="quickMsg('Nisaidie kutambua ugonjwa huu')">🇰🇪 Nisaidie kutambua ugonjwa</button>
+                    <button class="q-btn" onclick="quickMsg('How do I treat tomato blight?')">Tomato Blight Treatment</button>
+                    <button class="q-btn" onclick="quickMsg('Best crops for current weather?')">Weather Tips</button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANELS -->
+            <div class="side-panels">
+                
+                <!-- UPLOAD WIDGET -->
+                <div class="widget-card upload-widget">
+                    <h3>Upload Crop Photo</h3>
+                    <p>Diagnose your crop problems.</p>
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img src="../../tomato_disease.png" alt="Crop preview" id="imagePreview">
+                        <button class="remove-img-btn" id="removeImgBtn" onclick="removeImage()">✕</button>
+                    </div>
+                </div>
+
+                <!-- WEATHER WIDGET -->
+                <div class="widget-card weather-widget">
+                    <h3>Weather Update</h3>
+                    <div class="weather-info">
+                        <h4 id="weatherLocation">Detecting Location...</h4>
+                        <div class="weather-row">
+                            <span class="weather-label">Temperature:</span>
+                            <span class="weather-val" id="weatherTemp">--°C</span>
+                        </div>
+                        <div class="weather-row">
+                            <span class="weather-label">Conditions:</span>
+                            <span class="weather-val" id="weatherDesc">--</span>
+                            <span class="weather-icon" id="weatherIcon">☁️</span>
+                        </div>
+                    </div>
+                    <p class="weather-footer">Plan your farm activities accordingly.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER BANNER -->
+    <footer class="footer-banner">
+        <h2>Empowering Farmers, Improving Harvests</h2>
+        <p>Helping smallholder farmers increase productivity and reduce crop losses.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
