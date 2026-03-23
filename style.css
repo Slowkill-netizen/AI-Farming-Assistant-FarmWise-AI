@@ -363,6 +363,87 @@ body {
     height: 500px; /* Increased height for quick-actions */
 }
 
+.hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+/* MOBILE SIDEBAR */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--white);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    z-index: 3000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-sidebar.active {
+    right: 0;
+}
+
+.sidebar-header {
+    padding: 25px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-links {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-links a {
+    text-decoration: none;
+    color: var(--text-gray);
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.sidebar-links a:hover, .sidebar-links a.active {
+    background: var(--bg-color);
+    color: var(--primary);
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-gray);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2999;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 /* MODAL STYLES */
 .modal-overlay {
     position: fixed;
@@ -577,18 +658,17 @@ body {
 /* MOBILE MEDIA QUERIES (MOVE TO END) */
 @media (max-width: 768px) {
     .navbar {
-        flex-direction: column !important;
-        gap: 15px !important;
-        padding: 15px !important;
+        padding: 15px 5% !important;
+        flex-direction: row !important; /* Keep logo and hamburger on same line */
+        justify-content: space-between !important;
     }
 
     .nav-links {
-        width: 100% !important;
-        overflow-x: auto !important;
-        padding-bottom: 5px !important;
-        justify-content: flex-start !important;
-        gap: 15px !important;
-        -webkit-overflow-scrolling: touch !important;
+        display: none !important; /* Hide desktop links */
+    }
+
+    .hamburger-btn {
+        display: block !important;
     }
 
     .nav-links a {

@@ -281,3 +281,19 @@ function clearMemory() {
 window.onload = () => {
     checkProfile();
 };
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("mobileSidebar");
+    let overlay = document.getElementById("sidebarOverlay");
+    
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "sidebarOverlay";
+        overlay.className = "sidebar-overlay";
+        overlay.onclick = toggleSidebar;
+        document.body.appendChild(overlay);
+    }
+
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+}
