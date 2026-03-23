@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Journal - FarmWise AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span> FarmWise AI
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat.html">AI Chat</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="market.html">Market</a>
+            <a href="journal.html" class="active">Journal</a>
+        </div>
+    </nav>
+
+    <main class="main-app">
+        <div class="header-section">
+            <h2>📈 Farm Journal & Finance</h2>
+            <p>Track your daily activities and manage your farm's budget.</p>
+        </div>
+
+        <div class="app-grid">
+            <div class="content-panel">
+                <div class="journal-form">
+                    <h3>✍️ Log New Activity</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <input type="text" id="logText" class="form-group" style="width:100%;" placeholder="e.g. Planted 500 seedlings">
+                        <select id="logType" class="form-group" style="width:100%;">
+                            <option value="Activity">Work/Activity</option>
+                            <option value="Expense">Expense (Out)</option>
+                            <option value="Income">Income (In)</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                        <input type="number" id="logAmount" placeholder="Amount (KES) if money" style="width:100%;">
+                        <button class="btn-primary" onclick="addLog()" style="width:100%;">Post to Journal</button>
+                    </div>
+                </div>
+
+                <div id="logHistory">
+                    <!-- Logs injected here -->
+                </div>
+            </div>
+
+            <div class="side-panels">
+                <div class="widget-card">
+                    <h3>📊 Financial Summary</h3>
+                    <div class="chart-container" id="financeChart">
+                        <div class="bar" id="expenseBar" style="height: 0%; background: #EF4444;"><span class="bar-label">Expense</span></div>
+                        <div class="bar" id="incomeBar" style="height: 0%; background: #10B981;"><span class="bar-label">Income</span></div>
+                    </div>
+                    <div style="margin-top: 40px; text-align: center;">
+                        <h4 id="netBalance">Balance: KES 0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        let logs = JSON.parse(localStorage.getItem("farmLogs")) || [];
+
+        function renderLogs() {
+            const history = document.getElementById("logHistory");
+            const expenseBar = document.getElementById("expenseBar");
+            const incomeBar = document.getElementById("incomeBar");
+            const netBalance = document.getElementById("netBalance");
+
+            history.innerHTML = "<h3>📜 Recent Logs</h3>";
+            
+            let totalExpense = 0;
+            let totalIncome = 0;
+
+            logs.slice().reverse().forEach(log => {
+                const amountText = log.amount ? ` - KES ${log.amount.toLocaleString()}` : "";
+                history.innerHTML += `
+                    <div class="log-entry" style="border-left-color: ${log.type === 'Expense' ? '#EF4444' : (log.type === 'Income' ? '#10B981' : '#1B5E20')}">
+                        <div><strong>${log.type}:</strong> ${log.text}${amountText}</div>
+                        <div style="font-size: 12px; color: #666;">${new Date(log.date).toLocaleDateString()}</div>
+                    </div>
+                `;
+
+                if (log.type === "Expense") totalExpense += Number(log.amount || 0);
+                if (log.type === "Income") totalIncome += Number(log.amount || 0);
+            });
+
+            // Update Chart
+            const max = Math.max(totalExpense, totalIncome, 1);
+            expenseBar.style.height = `${(totalExpense / max) * 100}%`;
+            incomeBar.style.height = `${(totalIncome / max) * 100}%`;
+            
+            netBalance.innerText = `Balance: KES ${(totalIncome - totalExpense).toLocaleString()}`;
+        }
+
+        function addLog() {
+            const text = document.getElementById("logText").value;
+            const type = document.getElementById("logType").value;
+            const amount = document.getElementById("logAmount").value;
+
+            if (!text) return;
+
+            logs.push({ text, type, amount, date: new Date().toISOString() });
+            localStorage.setItem("farmLogs", JSON.stringify(logs));
+            
+            document.getElementById("logText").value = "";
+            document.getElementById("logAmount").value = "";
+            renderLogs();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLogs);
+    </script>
+</body>
+</html>

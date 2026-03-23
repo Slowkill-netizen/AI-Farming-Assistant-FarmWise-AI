@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Calendar - FarmWise AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="calendar-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span> FarmWise AI
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat.html">AI Chat</a>
+            <a href="calendar.html" class="active">Calendar</a>
+            <a href="market.html">Market</a>
+            <a href="journal.html">Journal</a>
+        </div>
+    </nav>
+
+    <main class="main-app">
+        <div class="header-section">
+            <h2>📅 Your Crop Calendar</h2>
+            <p>Personalized planting and harvesting schedules for your farm.</p>
+        </div>
+
+        <div class="app-grid">
+            <div class="content-panel">
+                <div class="widget-card">
+                    <div class="calendar-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="currentMonthYear">March 2026</h3>
+                        <div>
+                            <button class="btn-secondary" onclick="prevMonth()">←</button>
+                            <button class="btn-secondary" onclick="nextMonth()">→</button>
+                        </div>
+                    </div>
+                    
+                    <div id="calendarGrid" class="calendar-grid">
+                        <!-- Headings -->
+                        <div class="calendar-day-head">Sun</div>
+                        <div class="calendar-day-head">Mon</div>
+                        <div class="calendar-day-head">Tue</div>
+                        <div class="calendar-day-head">Wed</div>
+                        <div class="calendar-day-head">Thu</div>
+                        <div class="calendar-day-head">Fri</div>
+                        <div class="calendar-day-head">Sat</div>
+                        <!-- Days will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-panels">
+                <div class="widget-card">
+                    <h3>💡 Shauri la Bwana Shamba</h3>
+                    <div id="calendarAdvice" class="bot-message" style="font-size: 14px; background: #f9f9f9;">
+                        Loading expert advice...
+                    </div>
+                </div>
+
+                <div class="widget-card">
+                    <h3>➕ Add Reminder</h3>
+                    <div class="form-group">
+                        <label>Task Name</label>
+                        <input type="text" id="remName" placeholder="e.g. Apply Fertilizer">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="remDate">
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="addCustomReminder()">Add to Calendar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Specific page logic
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            updateCalendarAdvice();
+        });
+
+        let currentViewDate = new Date();
+
+        function renderCalendar() {
+            const grid = document.getElementById("calendarGrid");
+            const monthYear = document.getElementById("currentMonthYear");
+            
+            // Clear existing days (keep headers)
+            const heads = grid.querySelectorAll(".calendar-day-head");
+            grid.innerHTML = "";
+            heads.forEach(h => grid.appendChild(h));
+
+            const year = currentViewDate.getFullYear();
+            const month = currentViewDate.getMonth();
+            monthYear.innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentViewDate);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Padding
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement("div");
+                empty.className = "calendar-day";
+                empty.style.background = "#F3F4F6";
+                grid.appendChild(empty);
+            }
+
+            // Days
+            const profile = JSON.parse(localStorage.getItem("farmerProfile"));
+            const customReminders = JSON.parse(localStorage.getItem("reminders")) || [];
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "calendar-day";
+                if (d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
+                    dayDiv.classList.add("today");
+                }
+                
+                dayDiv.innerHTML = `<div class="day-number">${d}</div>`;
+
+                // Add crop events
+                if (profile && profile.crops) {
+                    const crops = profile.crops.toLowerCase();
+                    // Simple logic: Maize planting in March/April
+                    if (crops.includes("maize") && (month === 2 || month === 3)) {
+                        dayDiv.innerHTML += `<div class="calendar-event event-planting">🌽 Maize Planting</div>`;
+                    }
+                    if (crops.includes("tomato") && d % 10 === d) {
+                        dayDiv.innerHTML += `<div class="calendar-event event-custom">🍅 Tomato Spray</div>`;
+                    }
+                }
+
+                // Add custom reminders
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                customReminders.filter(r => r.date === dateStr).forEach(r => {
+                    dayDiv.innerHTML += `<div class="calendar-event event-custom">📌 ${r.name}</div>`;
+                });
+
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function prevMonth() {
+            currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function addCustomReminder() {
+            const name = document.getElementById("remName").value;
+            const date = document.getElementById("remDate").value;
+            if (!name || !date) return;
+
+            const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+            reminders.push({ name, date });
+            localStorage.setItem("reminders", JSON.stringify(reminders));
+            
+            document.getElementById("remName").value = "";
+            renderCalendar();
+        }
+
+        function updateCalendarAdvice() {
+            const adviceBox = document.getElementById("calendarAdvice");
+            const profile = JSON.parse(localStorage.getItem("farmerProfile"));
+            if (profile) {
+                adviceBox.innerHTML = `<strong>Habari ${profile.name}!</strong> Tukiwa mwezi wa Machi, ni wakati mzuri wa kuandaa mashamba kwa ajili ya kupanda ${profile.crops}. Hakikisha unatumia mbegu bora zilizoidhinishwa!`;
+            } else {
+                adviceBox.innerHTML = "Jambo mkulima! Please set up your profile in the Chat tab so I can give you personalized advice.";
+            }
+        }
+    </script>
+</body>
+</html>

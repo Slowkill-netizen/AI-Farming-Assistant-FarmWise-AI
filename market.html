@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Prices - FarmWise AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span> FarmWise AI
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat.html">AI Chat</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="market.html" class="active">Market</a>
+            <a href="journal.html">Journal</a>
+        </div>
+    </nav>
+
+    <main class="main-app">
+        <div class="header-section">
+            <h2>🛒 Market Price Tracker</h2>
+            <p>Real-time estimated crop prices across major Kenyan markets.</p>
+        </div>
+
+        <div class="app-grid">
+            <div class="content-panel">
+                <div class="widget-card">
+                    <table class="market-table">
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>Unit</th>
+                                <th>Average Price (KES)</th>
+                                <th>Trend</th>
+                                <th>Market</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketBody">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="side-panels">
+                <div class="widget-card" style="background: #E8F5E9;">
+                    <h3>💡 Best Time to Sell</h3>
+                    <p id="sellAdvice" style="font-size: 14px; color: #2E7D32;">
+                        Fetching seasonal market data...
+                    </p>
+                </div>
+
+                <div class="widget-card">
+                    <h3>📍 Select Market</h3>
+                    <select class="form-group" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;" onchange="updateMarketData(this.value)">
+                        <option value="national">National Average</option>
+                        <option value="nairobi">Nairobi (Wakulima)</option>
+                        <option value="mombasa">Mombasa (Kongowea)</option>
+                        <option value="kisumu">Kisumu (Jubilee)</option>
+                        <option value="nakuru">Nakuru (Municipal)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        const marketData = [
+            { crop: "Maize", unit: "90kg Bag", price: 3200, trend: "up", market: "Wakulima" },
+            { crop: "Tomatoes", unit: "Crate", price: 4500, trend: "down", market: "Kongowea" },
+            { crop: "Potatoes", unit: "50kg Bag", price: 2800, trend: "stable", market: "Municipal" },
+            { crop: "Beans (Yellow)", unit: "90kg Bag", price: 9500, trend: "up", market: "Jubilee" },
+            { crop: "Onions", unit: "Net (10kg)", price: 1200, trend: "up", market: "Wakulima" },
+            { crop: "Cabbage", unit: "Head", price: 50, trend: "stable", market: "Municipal" }
+        ];
+
+        function renderMarket() {
+            const body = document.getElementById("marketBody");
+            body.innerHTML = "";
+            
+            marketData.forEach(item => {
+                const trendIcon = item.trend === "up" ? "↑" : (item.trend === "down" ? "↓" : "→");
+                const trendClass = item.trend === "up" ? "trend-up" : (item.trend === "down" ? "trend-down" : "");
+                
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${item.crop}</strong></td>
+                        <td>${item.unit}</td>
+                        <td>KES ${item.price.toLocaleString()}</td>
+                        <td class="${trendClass}">${trendIcon} ${item.trend.charAt(0).toUpperCase() + item.trend.slice(1)}</td>
+                        <td>${item.market}</td>
+                    </tr>
+                `;
+            });
+
+            updateSellAdvice();
+        }
+
+        function updateSellAdvice() {
+            const advice = document.getElementById("sellAdvice");
+            advice.innerHTML = "<strong>Mkulima Tips:</strong> Beans and Onions are currently seeing a price surge in Nairobi. If you have harvest ready, now is the time to negotiate with buyers!";
+        }
+
+        function updateMarketData(m) {
+            // In a real app, this would fetch from a database. 
+            // For now, we'll just re-render the static data.
+            renderMarket();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderMarket);
+    </script>
+</body>
+</html>
